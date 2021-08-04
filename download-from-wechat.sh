@@ -8,17 +8,26 @@ URL=$1
 #Get voice_id value which will be used as mediaid in download url
 MEDIA_ID=`echo $URL | tr '&' '\n' | grep "voice_id" | cut -d '=' -f 2`
 
-#Create download url
-DOWNLOAD_URL="https://res.wx.qq.com/voice/getvoice?mediaid=$MEDIA_ID"
+#Check if MEDIA_ID extracted successfully or not
+if [ -z "$MEDIA_ID" ]
+then 
+  echo "Could not extract media id. Kindly ensure correct url is used."
+  exit 1
+else
+  #media id successfully retreived. 
+  #Create download url
+  DOWNLOAD_URL="https://res.wx.qq.com/voice/getvoice?mediaid=$MEDIA_ID"
 
-#added new code to get filename automatically
-CONTENT=$(wget -O - "$URL")
+  #added new code to get filename automatically
+  CONTENT=$(wget -O - "$URL")
 
-FILE_NAME=$(echo "$CONTENT" | grep og:title | cut -d '"' -f 4 | tr -d '[:space:]')
-OUTPUT_FILE_NAME="$FILE_NAME.mp3" #Add .mp3 extension
+  FILE_NAME=$(echo "$CONTENT" | grep og:title | cut -d '"' -f 4 | tr -d '[:space:]')
+  OUTPUT_FILE_NAME="$FILE_NAME.mp3" #Add .mp3 extension
 
-#echo "URL is: $URL"
-#echo "Download URL is: $DOWNLOAD_URL"
-#echo "Output File Name is: $OUTPUT_FILE_NAME"
+  #echo "URL is: $URL"
+  #echo "Download URL is: $DOWNLOAD_URL"
+  #echo "Output File Name is: $OUTPUT_FILE_NAME"
 
-wget -c $DOWNLOAD_URL -O $OUTPUT_FILE_NAME
+  #Download using wget
+  wget -c $DOWNLOAD_URL -O $OUTPUT_FILE_NAME
+fi
